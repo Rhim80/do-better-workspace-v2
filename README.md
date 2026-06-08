@@ -27,9 +27,6 @@ cd do-better-workspace
 ### 2. Claude Code에서 열기
 VS Code 또는 터미널에서 Claude Code 실행.
 
-> **줄바꿈 키 (Shift+Enter)**: 아래 3번 "워크스페이스 세팅해줘"를 실행하면 `Shift+Enter` 줄바꿈 키가 **자동으로 설정**됩니다. 따로 할 일은 없습니다.
-> (이 키 설정은 레포가 아니라 사용자 VS Code 환경에 저장되어 clone에 안 따라오므로, 세팅 스킬이 대신 잡아줍니다. 자동 설정이 안 되는 환경이면 Claude Code 프롬프트에 `/terminal-setup`을 한 번 입력하면 됩니다.)
-
 ### 3. 초기 설정
 
 Claude에게:
@@ -42,8 +39,7 @@ Claude에게:
 1. **프로필 작성** — CLAUDE.md의 "내 프로필" 섹션을 4개 질문으로 채움
 2. **Python 환경** — 데이터 스킬(csv-clean, excel-to-csv, pdf-to-md)용 `.venv` 생성 + 패키지 설치 (원할 때만)
 3. **선택 도구 체크** — `git`, `gws` (Google Workspace CLI) 설치 상태 확인 및 안내
-4. **줄바꿈 키** — `Shift+Enter` 줄바꿈을 VS Code에 자동 설정 (사용자 환경에 저장)
-5. **첫 Daily Note** — 오늘의 기록 시작
+4. **첫 Daily Note** — 오늘의 기록 시작
 
 각 단계는 건너뛸 수 있고, 이미 세팅된 항목은 자동 스킵됩니다.
 

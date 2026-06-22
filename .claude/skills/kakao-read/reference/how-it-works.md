@@ -35,14 +35,25 @@ ioreg -rd1 -c IOPlatformExpertDevice | grep IOPlatformUUID
 
 ## 2단계. 계정 userId (이게 사람마다 다르고, 한 번 구하면 됨)
 
-카톡은 **모든 인증 API 요청에 `talk-user-id: <본인 정수ID>` 헤더**를 붙인다. macOS의 HTTP 캐시(CFURLCache = `~/Library/Containers/com.kakao.KakaoTalkMac/Data/Library/Caches/Cache.db`)가 그 **요청 객체를 binary plist로 평문 저장**한다. 그래서 MITM·프록시 없이 디스크에서 바로 읽을 수 있다.
+userId는 **사람마다 다른 정수 하나**. 한 번 구해 `~/.config/kakao-read/config.json`에 캐시하면 끝. 구하는 방법이 카톡 버전에 따라 갈린다.
 
-- 위치: `Cache.db`의 `cfurl_cache_blob_data.request_object`
-- 구조: `root(dict) → "Array"(배열) → 각 item(dict)=HTTP 헤더 묶음`. `Authorization`이 있는 dict가 인증 요청이고, 같은 dict의 `talk-user-id`가 본인 ID.
-- **반드시 `plistlib`로 파싱.** binary plist(bplist00)라 단순 문자열/`strings` grep으로는 안 보인다 (여기서 한참 막혔던 함정).
-- 응답 본문(`cfurl_cache_receiver_data`)은 카톡이 암호화 → 못 읽음. 반면 요청 객체는 평문.
+**25.x (헤더 자동 추출 — 이젠 거의 안 됨)**: 카톡은 인증 API 요청에 `talk-user-id: <본인 정수ID>` 헤더를 붙였고, macOS HTTP 캐시(CFURLCache = `Caches/Cache.db`)가 그 요청 객체를 binary plist로 평문 저장했다. 그래서 MITM·프록시 없이 디스크에서 바로 읽었다.
+- 위치: `Cache.db`의 `cfurl_cache_blob_data.request_object` / 구조: `root(dict) → "Array" → 각 item(dict)=HTTP 헤더 묶음`, 그 안 `talk-user-id`.
+- **반드시 `plistlib`로 파싱**(binary plist라 `strings` grep으론 안 보임).
+- ⚠️ **Cache.db는 WAL(-wal) 모드**다. 데이터가 본체로 체크포인트되기 전엔 `-wal`에만 있다. `?immutable=1`로 열면 WAL을 무시해 **빈 DB로 보인다**(26.x 연동 실패의 직접 원인이었음). → `db`+`-wal`+`-shm`을 임시 복사한 뒤 정상 오픈(WAL 재생)해서 읽어야 한다(`_read_cache_blobs`).
 
-> 안 통한 길(기록): plist `FSChatWindowTransparency<숫자>` 공통꼬리 trick은 25.10.0엔 키가 없음(`FSChatWindowFrame_<해시>`로 바뀜). mitmproxy 실시간 캡처는 cert pinning에 막히고 애초에 불필요(헤더가 평문 캐시). → 결국 위 Cache.db talk-user-id가 정답.
+**26.x (plist SHA-512 해시 역산 — 자동)**: 26.5.0에서 `talk-user-id` 헤더가 캐시에서 사라졌고(이젠 CDN 이미지 요청만 캐시됨), 컨테이너 전체를 훑어도 userId **평문**이 없다(2026-06-22 전수 스캔: 9,984파일·6,654 숫자 후보 매칭 0, hex·LE/BE 정수·base64 인코딩 스캔도 0). 그래서 한동안 "자동 불가"로 보였다. **하지만 평문이 아니라 해시로 남아 있었다.**
+- 핵심: 카톡이 일부 plist 키 **이름**을 `DESIGNATEDFRIENDSREVISION:<128hex>` / `DENYFILEEXTIONSIONREVISION:<128hex>` 형태로 저장하는데, 이 `<128hex>` = **`SHA-512(str(userId))`**. (보너스: 같은 해시의 특정 슬라이스가 `Application Support/.../<40hex>` per-account 미디어 폴더 이름과 일치 — 그것도 userId 해시 파생이다.)
+- 위치: `Containers/.../Preferences/com.kakao*.plist` + `~/Library/Preferences/com.kakao*.plist`. `plutil -p`로 덤프해 위 접두어 뒤 128hex를 긁는다(`userid_hashes_from_plist`).
+- 복구: userId를 **brute force 역산**. `SHA-512(str(uid)) == 타겟 해시`를 7자리부터 올려가며 멀티코어로 찾는다(`recover_user_id_from_plist`). SHA-512는 PBKDF2보다 ~10만 배 빨라(단일코어 ~125만/s) 7자리 ~1초, 9자리 멀티코어 ~2분, 최악 10자리 ~17분. 찾은 값은 `derive_db_name` 오라클로 한 번 더 확인 후 캐시.
+- plist는 휘발성 캐시와 달리 **항상 디스크에 있어** 26.x에서 안정적. userId를 알면 `setup <userId>`로 역산 생략(SHA-512 1회 대조).
+
+**brute force 구현 함정 2개 (점검에서 잡음, 미래 유지보수용):**
+1. **멀티프로세싱은 `fork` 컨텍스트로.** macOS 기본 `spawn`은 워커마다 모듈을 re-import하는데, `python3 - <<heredoc`나 일부 실행 환경에선 `<stdin>` 모듈을 못 찾아 워커가 전부 죽고 에러가 수십만 줄 폭주한다. 워커가 순수 hashlib만 쓰므로 `mp.get_context("fork")`가 안전하고 빠르다(re-import 없음).
+2. **워커는 청크 내 매칭을 *모두* 반환해야 한다.** plist엔 두 접두어에 해시가 **둘 이상** 들어있다(실측: 한 기기에서 2개 관측 — 본인 userId의 SHA-512 + 정체불명 1개. 후자는 9자리 이하 userId가 아니어서 채널/리비전 카운터 등 **비-userId 해시**로 추정). 워커가 첫 매칭에서 멈추면, 본인 아닌 해시가 같은 청크에서 먼저 잡힐 때 본인 userId를 영영 놓친다. 매칭을 다 모아 반환하고, 오라클(`derive_db_name` 일치) 검증은 메인이 한다 — 이 오라클이 섞인 해시를 거르고 본인 것만 통과시키는 최종 방어선이다. (비-userId 해시는 brute force가 절대 못 맞히지만, 본인 userId는 plist에 반드시 있어 찾고 멈춘다.)
+
+> 안 통한 길(기록): ① plist `FSChatWindowTransparency<숫자>` 공통꼬리 trick은 25.10.0엔 키 없음. ② mitmproxy 실시간 캡처는 cert pinning에 막힘. ③ **(26.5.0)** 평문/hex/정수/base64 디스크 전수 스캔 0건. ④ Cache.db 헤더는 콜드 스타트(완전 종료 후 재실행, 45초 폴링)에도 안 돌아옴 — 26.5는 인증 API를 NSURLCache에 아예 안 담는다. ⑤ Mac 프로세스 메모리 직독은 SIP로 막힘. ⑥ derive_db_name(PBKDF2) 직접 brute force는 62ms/회라 비실용(7자리 17시간). ⑦ 카카오 로그인 "회원번호(app_user_id)"는 앱마다 다른 가명 ID라 talk-user-id와 별개, accounts.kakao.com도 회원번호 표시 제거 → 사용자 직접 확인 경로 불가. **결국 plist 키 이름의 SHA-512(userId)가 유일한 안정 대체 소스**. (키 도출·복호화 알고리즘은 25.x와 동일 — 버전마다 바뀐 건 "userId를 어디서 얻느냐"뿐.)
+> 출처: [cskwork/kakao-userid-recover](https://github.com/cskwork/kakao-userid-recover) (plist SHA-512 역산 메커니즘), blluv gist / kakaocli (키 도출 공식).
 
 ## 3단계. 파일명·키 도출 (공개된 공식)
 

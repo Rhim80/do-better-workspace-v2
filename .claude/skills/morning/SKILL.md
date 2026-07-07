@@ -49,7 +49,9 @@ behind 있으면 `[todo]` git pull, 없으면 `[done]`. (원격이 없으면 조
 도착 신선도 범용 스니펫 (날짜 필드명·기대일은 선언표에서):
 
 ```bash
-grep -hoE "^(kakao_date|source_date): *[0-9]{4}-[0-9]{2}-[0-9]{2}" "$WS_ROOT/00-inbox/raw/"*.md 2>/dev/null \
+# find 기반 — 원본함이 비어도 zsh "no matches found" 에러가 안 난다 (glob 대신)
+find "$WS_ROOT/00-inbox/raw" -maxdepth 1 -name '*.md' -exec \
+  grep -hoE "^(kakao_date|source_date): *[0-9]{4}-[0-9]{2}-[0-9]{2}" {} + 2>/dev/null \
   | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}" | sort | tail -1
 ```
 

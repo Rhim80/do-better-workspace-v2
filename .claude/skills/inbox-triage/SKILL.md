@@ -52,7 +52,8 @@ WS_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 수집 실행은 이 스킬의 일이 아니다 — 최신 수집분까지 당겨서 분류하려면 **/collect를 먼저** 돌린다 (morning 이어가기는 이미 그 순서로 온다). 여기서는 raw에 있는 것만 스캔한다.
 
 ```
-grep -lZ "processed: false" $WS_ROOT/00-inbox/raw/*.md 2>/dev/null
+# find 기반 — 원본함이 비어도 zsh "no matches found" 에러가 안 난다 (glob 대신)
+find "$WS_ROOT/00-inbox/raw" -maxdepth 1 -name '*.md' -exec grep -lZ "processed: false" {} + 2>/dev/null
 ```
 
 - 선언표 원본함 `모양.제외` 디렉터리(첨부 원본 저장소)는 스캔 대상 아님.

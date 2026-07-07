@@ -28,6 +28,7 @@
 | 44-reflections | 40-personal/ | 회고 및 학습 |
 | 46-todos | 40-personal/ | active-todos.md |
 | 37-claude-code | 30-knowledge/ | Claude Code 관련 지식 |
+| **08-registry** | 00-system/ | **자리 선언표 + 내 세계 사전 — 일-순환 스킬이 읽는 내 지도** |
 
 ## Wiki (30-knowledge/00-wiki/)
 
@@ -54,6 +55,15 @@
 
 - 모든 비텍스트 파일 저장
 - 명명: `[관련노트]_[설명].[ext]`
+
+## 일 순환 (수집 → 가르기 → 아침)
+
+정보가 "AI 판 위에서" 굴러가게 하는 세 스킬. 자기 목록이 없고 **자리 선언표**(`00-system/08-registry/자리-선언표.yaml`)와 **내 세계 사전**(`내-세계-사전.yaml`)을 읽고 돈다 — 채널·점검을 추가할 땐 스킬이 아니라 선언표에 한 줄 등록한다.
+
+- **/collect** — 선언된 수집기를 돌려 `00-inbox/raw/`에 원본을 쌓는다 (원본은 쌓기만 — 처리돼도 안 지움)
+- **inbox-triage** — raw를 판정해 todo·일정·보관으로 라우팅. 가역 반영은 실행 후 보고, 밖으로 나가는 것(발송·확정)은 초안까지 차려 사람이 확정
+- **morning** — 아침 상태판: 수집기 신선도 + 표면 점검 + 이어가기
+- **/collector-check** — 새 채널을 붙이기 전 수집기 약속 6문 검사 (`00-system/03-guides/수집기-약속.md`)
 
 ## Skills 사용
 

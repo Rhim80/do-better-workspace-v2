@@ -11,7 +11,7 @@ allowed-tools:
 # setup-workspace
 
 Do Better Workspace를 처음 clone한 사용자를 위한 초기 설정 스킬.
-5단계: **루트 확인 → 프로필 → Python 환경 → 선택 도구 안내 → 첫 Daily Note**.
+6단계: **루트 확인 → 프로필 → Python 환경 → 선택 도구 안내 → 자리 선언표 → 첫 Daily Note**.
 
 ## 수행 작업
 
@@ -47,8 +47,12 @@ test -d 40-personal/46-todos    || missing+=("40-personal/46-todos/")
 # Todo 시드 (todo/todos 스킬 타깃)
 test -f 40-personal/46-todos/active-todos.md || missing+=("40-personal/46-todos/active-todos.md")
 
-# raw 인박스 (kakao-read 수집 → inbox-triage 분류 경로)
+# raw 인박스 (수집기 → inbox-triage 분류 경로)
 test -d 00-inbox/raw || missing+=("00-inbox/raw/")
+
+# 자리 선언표·내 세계 사전 (morning·collect·inbox-triage가 읽는 개인 층)
+test -f 00-system/08-registry/자리-선언표.yaml   || missing+=("00-system/08-registry/자리-선언표.yaml")
+test -f 00-system/08-registry/내-세계-사전.yaml  || missing+=("00-system/08-registry/내-세계-사전.yaml")
 
 # Wiki 시드 (wiki-ingest, wiki-lint가 읽고 씀)
 test -f 30-knowledge/00-wiki/SCHEMA.md || missing+=("30-knowledge/00-wiki/SCHEMA.md")
@@ -190,21 +194,31 @@ fi
 
 설치까지 자동으로 하지 않음. 사용자가 필요성 판단 후 진행.
 
-### 6. 첫 Daily Note 생성 제안
+### 6. 자리 선언표 안내 (일-순환 스킬의 지도)
+
+morning(아침 상태판)·collect(수집 러너)·inbox-triage(가르기)는 자기 목록 없이 **자리 선언표**(`00-system/08-registry/자리-선언표.yaml`)와 **내 세계 사전**(`내-세계-사전.yaml`)을 읽고 돈다. 여기서는 안내만 한다:
+
+- **기본값**(할일·일기·위키·원본함)은 이 골격 그대로면 손댈 것 없음 — 바로 동작한다.
+- **[빈칸]은 지금 다 채우지 않는다.** 세팅은 질문지가 아니라 **실물에 잣대 대기** — 내 업무의 중심 표·내 채널·"항상 패스" 목록은 실물(카톡방·엑셀·메일함)을 열어 놓고 하나씩 채운다. 쓰다가 교정이 생길 때마다 사전에 한 줄씩 쌓인다 (그게 정상 속도).
+- **최소 성립 조건**: 자동 수집 채널 1개 — 손 수집만으로는 "멈춤"과 "없음"을 구분할 수 없어 감시가 안 된다. Mac+카톡이면 kakao-read(위 sqlcipher 세팅)가 바로 후보.
+- 새 수집기를 붙일 땐 `/collector-check`로 검사표 6문을 통과시킨다 (기준: `00-system/03-guides/수집기-약속.md`).
+
+### 7. 첫 Daily Note 생성 제안
 
 "오늘의 첫 Daily Note를 만들까요? (Y/n)"
 Yes면 `daily-note` 스킬 호출.
 
-### 7. 다음 단계 안내
+### 8. 다음 단계 안내
 
 ```
 워크스페이스 세팅 완료!
 
 다음에 해볼 것:
-1. "오늘 daily note 만들어줘" → 매일의 기록 시작
-2. "할 일 추가해줘: XXX" → 첫 todo 추가
-3. "같이 생각해보자: XXX" → thinking-partner로 문제 탐색
-4. "이 아이디어 저장해줘" → idea 스킬로 인사이트 캡처
+1. "morning" → 아침 상태판 (수집기 신선도 + 표면 점검 + 이어가기)
+2. "오늘 daily note 만들어줘" → 매일의 기록 시작
+3. "할 일 추가해줘: XXX" → 첫 todo 추가
+4. "카톡 체크" (Mac) → 첫 수집 → "인박스 분류해줘" → 가르기 한 바퀴
+5. "같이 생각해보자: XXX" → thinking-partner로 문제 탐색
 
 폴더 구조 힌트:
 - 00-inbox/ : 생각나는 즉시 캡처

@@ -1,13 +1,13 @@
 ---
 name: collector-check
-description: 새 수집기를 시스템에 붙이기 전(또는 붙인 뒤 정기적으로) 수집기 약속 검사표 6문을 자동 실행하고 결과를 보고한다. "수집기 검사", "collector check", "이 채널 붙여도 돼?", "수집기 점검" 등을 언급하면 자동 실행. 검사 기준은 00-system/03-guides/수집기-약속.md.
+description: 새 수집기를 시스템에 붙이기 전(또는 붙인 뒤 정기적으로) 수집기 약속 검사표 7문을 자동 실행하고 결과를 보고한다. "수집기 검사", "collector check", "이 채널 붙여도 돼?", "수집기 점검" 등을 언급하면 자동 실행. 검사 기준은 00-system/03-guides/수집기-약속.md.
 argument-hint: <선언표의 수집기 이름> (없으면 선언된 수집기 전체)
 allowed-tools:
   - Bash
   - Read
 ---
 
-# /collector-check — 수집기 검사 (검사표 6문 자동 실행)
+# /collector-check — 수집기 검사 (검사표 7문 자동 실행)
 
 비개발자가 "두 번 실행해서 증가 0 확인" 같은 검사를 직접 할 수는 없다. 이 스킬이 대신 실행하고 **통과/실패/사람확인**으로 보고한다.
 
@@ -20,7 +20,7 @@ WS_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 - 선언표 `$WS_ROOT/00-system/08-registry/자리-선언표.yaml` 수집기 절 (대상 수집기의 선언)
 - 기준 문서 `$WS_ROOT/00-system/03-guides/수집기-약속.md`
 
-## 검사 절차 (6문)
+## 검사 절차 (7문)
 
 대상 수집기마다:
 
@@ -36,6 +36,8 @@ WS_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 
 **6문. 포착 (선언 1)** — 선언의 `포착`이 전량인지 골라 넣기인지 확인. 골라 넣기면 놓침을 잴 방법(주기 리마인드·실행신선도)이 선언돼 있는지 본다.
 
+**7문. 보존 (약속 6)** — 원본이 몇 벌, 어디에 있는지 본다. ① raw/가 git에 올라가는지(`git ls-files 00-inbox/raw/ | head -1`) ② 원격이 있는지(`git remote get-url origin`) ③ 원격이 있으면 공개 여부(`gh repo view --json visibility` — gh가 없으면 사람확인: "저장소 페이지에서 Public/Private 표시를 봐 주세요"). **공개(public)면 실패** — "대화·통화 원문이 인터넷에 노출됩니다. 저장소를 비공개로 바꾸세요." 원격이 없으면 경고 — "원본이 이 컴퓨터 한 벌뿐입니다. 고장 나면 잃습니다."
+
 ## 보고 형식
 
 ```
@@ -48,6 +50,7 @@ WS_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 | 4 | 프라이버시 | 통과/경고 | OTP 패턴 0건 |
 | 5 | 지속성 | 정보 | 돌봄 의존: ... |
 | 6 | 포착 | 통과/경고 | 전량 / 골라 넣기+감시 있음 |
+| 7 | 보존 | 통과/실패/경고 | 비공개 원격 = 두 벌 |
 
 판정: 붙여도 됨 / 보완 후 (□□) / 사람확인 대기 (3문)
 ```

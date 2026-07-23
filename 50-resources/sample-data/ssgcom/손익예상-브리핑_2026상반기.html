@@ -1,0 +1,251 @@
+<meta charset="utf-8">
+<title>SSG.COM 손익예상 브리핑 · 2026 상반기</title>
+<style>
+  /* ===== Design tokens (design.md 단일 출처) ===== */
+  :root{
+    --ssg-red:#FF5452; --ssg-red-deep:#E24F4F; --deep-navy:#002041; --premium-gold:#966E46;
+    --canvas:#FFFFFF; --surface-soft:#F9F9F9; --surface-dim:#E9E9E9;
+    --hairline:#E5E5E5; --hairline-strong:#D8D8D8;
+    --text-primary:#222222; --text-secondary:#666666; --text-tertiary:#888888; --text-inverse:#FFFFFF;
+    --negative:#FF5452;
+    --xs:4px; --sm:8px; --md:16px; --lg:24px; --xl:40px; --xxl:64px;
+    --r-sm:4px; --r-md:8px; --r-full:999px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{
+    font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    color:var(--text-primary); background:var(--surface-dim);
+    font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .num{font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+
+  /* ===== A4 page ===== */
+  .page{
+    width:794px; min-height:1123px; margin:0 auto; background:var(--canvas);
+    padding:0 0 var(--xl); position:relative;
+  }
+  .page + .page{margin-top:24px}
+  .inner{width:720px; margin:0 auto}
+
+  /* ===== Header band (deep-navy 64px) ===== */
+  .doc-header{
+    height:64px; background:var(--deep-navy); color:var(--text-inverse);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 37px; margin-bottom:var(--xl);
+  }
+  .doc-header .title{font-size:17px; font-weight:600; letter-spacing:-.2px}
+  .doc-header .meta{font-size:12px; font-weight:400; color:#B9C4CF; text-align:right; line-height:1.4}
+
+  h2.section{
+    font-size:22px; font-weight:700; line-height:1.35; letter-spacing:-.3px;
+    margin:var(--xl) 0 var(--md); padding-bottom:var(--sm);
+    border-bottom:1px solid var(--hairline-strong);
+  }
+  h2.section:first-of-type{margin-top:0}
+  .sec-no{color:var(--text-tertiary); font-weight:700; margin-right:8px}
+
+  /* ===== KPI cards ===== */
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:var(--md)}
+  .kpi{
+    border:1px solid var(--hairline); border-radius:var(--r-md);
+    padding:var(--md); background:var(--canvas);
+  }
+  .kpi .label{font-size:12px; font-weight:500; color:var(--text-secondary)}
+  .kpi .value{font-size:28px; line-height:1.1; font-weight:700; margin:var(--sm) 0 var(--xs)}
+  .kpi .value .unit{font-size:14px; font-weight:500; color:var(--text-secondary); margin-left:2px}
+  .kpi .delta{font-size:12px; color:var(--text-secondary); line-height:1.5}
+  .kpi .delta b{color:var(--text-primary); font-weight:700}
+  .kpi .delta .neg{color:var(--negative); font-weight:700}
+
+  .lead{
+    margin-top:var(--md); padding:var(--md); background:var(--surface-soft);
+    border-left:3px solid var(--ssg-red); border-radius:0 var(--r-md) var(--r-md) 0;
+    font-size:14px; line-height:1.65;
+  }
+  .lead b{font-weight:700}
+  .neg{color:var(--negative); font-weight:700}
+  .note{font-size:11px; color:var(--text-tertiary); line-height:1.5; margin-top:var(--sm)}
+
+  /* ===== Tables ===== */
+  table{width:100%; border-collapse:collapse; margin:var(--md) 0 var(--sm); font-size:13px}
+  table.data thead th{
+    background:var(--deep-navy); color:var(--text-inverse);
+    font-size:12px; font-weight:600; padding:9px 10px; text-align:right; white-space:nowrap;
+  }
+  table.data thead th:first-child{text-align:left}
+  table.data tbody td{padding:8px 10px; text-align:right; border-bottom:1px solid var(--hairline); white-space:nowrap}
+  table.data tbody td:first-child{text-align:left; color:var(--text-primary); font-weight:500}
+  table.data tbody tr:nth-child(even){background:var(--surface-soft)}
+  table.data td.pos{font-weight:700}
+  table.data td.neg{color:var(--negative); font-weight:700}
+  .badge{display:inline-block; font-size:11px; font-weight:600; padding:1px 7px; border-radius:var(--r-full); border:1px solid var(--hairline-strong); color:var(--text-secondary)}
+  .badge.ok{color:var(--text-primary)}
+  .badge.bad{color:var(--negative); border-color:var(--negative)}
+  .pill-gold{display:inline-block; font-size:11px; font-weight:600; color:var(--premium-gold); border:1px solid var(--premium-gold); border-radius:var(--r-full); padding:1px 8px}
+
+  /* ===== interpretation bullets ===== */
+  ul.interp{list-style:none; margin:var(--sm) 0 0}
+  ul.interp li{position:relative; padding-left:14px; margin-bottom:6px; font-size:13px; line-height:1.6; color:var(--text-primary)}
+  ul.interp li::before{content:""; position:absolute; left:0; top:9px; width:4px; height:4px; background:var(--text-tertiary); border-radius:var(--r-full)}
+  ul.interp li b{font-weight:700}
+
+  /* ===== warning block ===== */
+  .warn{
+    background:var(--surface-soft); border-left:3px solid var(--ssg-red);
+    padding:12px var(--md); border-radius:0 var(--r-md) var(--r-md) 0; margin:var(--sm) 0; font-size:13px; line-height:1.6;
+  }
+  .warn .h{font-weight:700; margin-bottom:2px}
+
+  /* ===== comment candidates ===== */
+  .comments{display:flex; flex-direction:column; gap:var(--sm); margin-top:var(--sm)}
+  .comment{border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px var(--md); font-size:13px; line-height:1.6}
+  .comment .tag{font-size:11px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:3px}
+
+  /* ===== footer ===== */
+  .footer{
+    width:720px; margin:var(--xl) auto 0; padding-top:var(--md);
+    border-top:1px solid var(--hairline); font-size:11px; color:var(--text-tertiary); line-height:1.6;
+  }
+
+  @page{size:A4; margin:0}
+  @media print{
+    body{background:var(--canvas)}
+    .page{margin:0; box-shadow:none; width:auto; min-height:auto}
+    .page + .page{margin-top:0}
+    .kpi-row,table,.warn,.comment,.lead{break-inside:avoid}
+    h2.section{break-after:avoid}
+    h2.section.brk{break-before:page}
+  }
+  @media screen{ .page{box-shadow:0 4px 12px rgba(0,0,0,.08)} body{padding:24px 0} }
+</style>
+
+<!-- ========== PAGE 1 ========== -->
+<section class="page">
+  <div class="doc-header">
+    <div class="title">SSG.COM 손익예상 브리핑 — 2026 상반기</div>
+    <div class="meta">기준: 2026.01–06 일별 실적<br>작성: 경영관리팀 FP&amp;A</div>
+  </div>
+  <div class="inner">
+
+    <h2 class="section"><span class="sec-no">01</span>헤드라인</h2>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="label">총거래액 (GMV)</div>
+        <div class="value num">2,482.4<span class="unit">억</span></div>
+        <div class="delta num">Q2 1,293.8억 · <b>+8.9%</b></div>
+      </div>
+      <div class="kpi">
+        <div class="label">순매출</div>
+        <div class="value num">1,258.2<span class="unit">억</span></div>
+        <div class="delta num">Q2 661.0억 · <b>+10.7%</b></div>
+      </div>
+      <div class="kpi">
+        <div class="label">공헌이익</div>
+        <div class="value num">307.6<span class="unit">억</span></div>
+        <div class="delta num">Q2 160.2억 · <b>+8.6%</b></div>
+      </div>
+      <div class="kpi">
+        <div class="label">공헌이익률</div>
+        <div class="value num">12.4<span class="unit">%</span></div>
+        <div class="delta num">Q2 12.38% · <span class="neg">−0.03%p</span></div>
+      </div>
+    </div>
+
+    <div class="lead">
+      <b>핵심 한 줄</b> — 거래액 +8.9%, 공헌이익률은 평탄한데 <b>영업이익 관점은 H1 <span class="neg">−48.6억</span> 적자</b>(Q1 −24.0 → Q2 −24.4). 성장이 고정비를 아직 못 덮고 있고, Q2에 늘어난 공헌이익(+12.7억)을 5월 마케팅 급증이 그대로 상쇄했다.
+    </div>
+    <div class="note">※ 공헌이익은 프로모션 자사분담 <b>차감 전(구조 기준)</b>. 자사분담은 비용계획의 ‘마케팅·프로모션’ 라인에 이미 포함되어, 영업이익 브릿지의 이중차감을 피하려 §3에서 별도 검증한다. 전기 대비 = Q2 vs Q1(반기 데이터).</div>
+
+    <h2 class="section"><span class="sec-no">02</span>사업부별 손익 <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">(억원, Q1 → Q2)</span></h2>
+    <table class="data">
+      <thead><tr><th>사업부</th><th>GMV</th><th>순매출</th><th>공헌이익</th><th>공헌율</th></tr></thead>
+      <tbody>
+        <tr><td>그로서리 <span class="badge">직매입</span></td><td class="num">501.1 → 559.2</td><td class="num">492.6 → 549.6</td><td class="num">66.5 → 74.1</td><td class="num">13.3%</td></tr>
+        <tr><td>브랜드패션 <span class="badge">위수탁</span></td><td class="num">368.6 → 387.4</td><td class="num">73.7 → 77.7</td><td class="num">60.1 → 63.4</td><td class="num">16.4%</td></tr>
+        <tr><td>라이프스타일 <span class="badge">오픈마켓</span></td><td class="num">319.0 → 347.1</td><td class="num">31.0 → 33.7</td><td class="num">20.9 → 22.6</td><td class="num">6.5%</td></tr>
+      </tbody>
+    </table>
+    <ul class="interp">
+      <li><b>그로서리</b> — Q2 +11.6%로 3개 사업부 중 견인차. 단 5월 새벽배송 쿠폰(P2605)이 GMV를 밀어올린 결과라 <b>순수 성장이 아니라 산 성장</b>(§3 순효과 −3.3억). 직매입 원가율 68~78%가 눌러 공헌율 13.3%로 구조적으로 낮다.</li>
+      <li><b>브랜드패션</b> — 가장 안정적. 위수탁 수수료매출 구조라 순매출은 GMV의 20% 수준이나 공헌율 16.4%로 최고. <span class="pill-gold">명품·부티크</span> 설 기저효과(2월 −35%) 외 특이변동 없음.</li>
+      <li><b>라이프스타일</b> — 공헌율 6.5%로 최저. 오픈마켓 수수료율(가전 7%·리빙 12%대)이 낮아 GMV가 커도 남는 게 적다. 6월 여름가전 페스타(P2606)까지 얹으면 <b>가전은 실질 적자</b>(§3).</li>
+    </ul>
+
+    <h2 class="section"><span class="sec-no">03</span>프로모션 손익 검증 <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">(직전 동일길이 비프로모션 기간 대비 증분)</span></h2>
+    <table class="data">
+      <thead><tr><th>프로모션</th><th>기간</th><th>증분 GMV</th><th>증분 공헌</th><th>자사분담</th><th>순효과</th></tr></thead>
+      <tbody>
+        <tr><td>P2601 설 선물세트</td><td class="num">1/12–25</td><td class="num">+44.4</td><td class="num">+6.1</td><td class="num">−2.1</td><td class="pos num">+4.04 <span class="badge ok">남는 장사</span></td></tr>
+        <tr><td>P2604 유클 멤버십위크</td><td class="num">4/6–12</td><td class="num">+20.7</td><td class="num">+2.6</td><td class="num">−2.5</td><td class="num">+0.13 <span class="badge">본전</span></td></tr>
+        <tr><td>P2605 새벽배송 쿠폰대전</td><td class="num">5/8–21</td><td class="num">+27.3</td><td class="num">+3.6</td><td class="num">−7.0</td><td class="neg num">−3.34 <span class="badge bad">적자</span></td></tr>
+        <tr><td>P2606 여름 가전 페스타</td><td class="num">6/15–28</td><td class="num">+5.8</td><td class="num">+0.2</td><td class="num">−1.7</td><td class="neg num">−1.45 <span class="badge bad">적자</span></td></tr>
+      </tbody>
+    </table>
+    <ul class="interp">
+      <li><b>P2605 (<span class="neg">−3.34억</span>)</b> — 자사분담률 80%(6.96억)가 원인. 증분공헌 3.6억으로는 분담액을 못 덮는다. 신규 권역 LTV·재구매 데이터로 <b>투자 정당화가 별도로 필요</b>. 매출은 늘었지만 이 건만 보면 남는 장사가 아니었다.</li>
+      <li><b>P2606 (<span class="neg">−1.45억</span>)</b> — 가전 공헌율 3.9%가 원래 얇은데 자사분담 1.68억을 얹으니 즉시 적자. 경쟁사 대응이라지만 방어 효과(이탈 방지분)를 계량하지 않으면 반복 근거가 없다.</li>
+      <li><b>P2601 (+4.04억)</b> — 유일하게 명확히 남은 장사. 자사분담률 50%(카드사 공동분담)로 부담이 낮았던 게 결정적. <b>자사분담률 상한 관리가 손익을 가른다.</b></li>
+    </ul>
+
+  </div>
+</section>
+
+<!-- ========== PAGE 2 ========== -->
+<section class="page">
+  <div class="inner">
+
+    <h2 class="section"><span class="sec-no">04</span>이상 신호</h2>
+    <div class="warn">
+      <div class="h">거래액 ±30% 변동 (격주)</div>
+      신선식품 +32% · 가공식품 +33% · 생수·음료 +32% · 델리·베이커리 +32% (모두 5/7–5/20) → <b>P2605 새벽배송 쿠폰</b>에 정확히 대응. 종료 후 반락 여부 6월 모니터링 필요. 명품·부티크 −35%(1/29–2/11) → 설 프로모션 종료 + 명절 후 명품 수요 급감(기저효과, 정상).
+    </div>
+    <div class="warn">
+      <div class="h">공헌이익률 −1.0%p 하락 — 해당 없음</div>
+      카테고리 공헌율은 마스터의 원가·수수료율이 고정이라 구조적으로 평탄. 즉 <b>마진 압박은 ‘율 하락’이 아니라 프로모션 자사분담과 믹스로 발생</b> — 검출 규칙을 자사분담 반영 후 실효공헌율로 볼 필요.
+    </div>
+    <div class="warn">
+      <div class="h">비용 계획 대비 110% 초과 (마케팅·프로모션)</div>
+      1월 127% · 4월 135% · <b>5월 <span class="neg">223%</span>(13.4억, 계획 6.0억)</b> · 6월 150%. 5월이 압도적 — P2605 확대 집행분. H1 마케팅 누계 계획 36억 대비 <b>48.1억(134%)</b>. Q2 공헌이익 증가분(+12.7억)이 영업이익으로 안 떨어진 직접 원인.
+    </div>
+
+    <h2 class="section"><span class="sec-no">05</span>하위 위험군 <span style="font-size:12px;font-weight:400;color:var(--text-secondary)">(공헌이익 기여 하위 3)</span></h2>
+    <table class="data">
+      <thead><tr><th>카테고리</th><th>H1 공헌</th><th>공헌율</th><th>GMV</th><th>매입유형</th></tr></thead>
+      <tbody>
+        <tr><td>반려동물</td><td class="num">6.4</td><td class="num">9.7%</td><td class="num">66.1</td><td class="num"><span class="badge">오픈마켓</span></td></tr>
+        <tr><td>유아동</td><td class="num">10.0</td><td class="num">9.7%</td><td class="num">103.0</td><td class="num"><span class="badge">오픈마켓</span></td></tr>
+        <tr><td>가전·디지털</td><td class="num">13.2</td><td class="neg num">3.9%</td><td class="num">337.3</td><td class="num"><span class="badge">오픈마켓</span></td></tr>
+      </tbody>
+    </table>
+    <ul class="interp">
+      <li><b>공통점</b> — 3종 모두 <b>라이프스타일(오픈마켓)</b> 소속. 낮은 수수료율(7~13%)로 공헌율이 구조적으로 얇다. 특히 가전은 GMV 337억(전체 2위 규모)인데 공헌은 13.2억뿐 — <b>GMV는 크고 손익은 없는 트래픽 카테고리</b>. 프로모션 얹으면 바로 적자라 할인 정책을 가장 보수적으로 가져가야 할 구간.</li>
+    </ul>
+
+    <h2 class="section brk"><span class="sec-no">06</span>경영회의 코멘트 후보</h2>
+    <div class="comments">
+      <div class="comment"><span class="tag">① 숫자형</span>“상반기 GMV 2,482억(+8.9%), 공헌이익 307.6억이나 고정비 356억으로 영업 <span class="neg">−48.6억</span>. 마진율이 아니라 규모의 미달이 적자 원인.”</div>
+      <div class="comment"><span class="tag">② 흐름형</span>“Q2 들어 그로서리 주도로 외형은 8.9% 성장했지만, 5월 새벽배송 프로모션에 마케팅비가 계획의 2.2배로 집행되며 늘어난 공헌이익을 그대로 상쇄했다. 성장의 질이 아직 이익으로 전환되지 않고 있다.”</div>
+      <div class="comment"><span class="tag">③ 헤드라인형</span>“판 건 늘었는데, 산 성장이었다 — 자사분담률 관리가 다음 분기 손익의 핵심.”</div>
+    </div>
+
+    <h2 class="section"><span class="sec-no">07</span>액션 테이블</h2>
+    <table class="data">
+      <thead><tr><th>담당</th><th style="text-align:left">액션 · 성공 기준</th><th>기한</th><th>우선순위</th></tr></thead>
+      <tbody>
+        <tr><td>마케팅팀</td><td style="text-align:left">프로모션 자사분담률 상한 룰 신설(승인 게이트) · <i>신규 평균 분담률 ≤60%</i></td><td class="num">7/31</td><td><span class="badge bad">높음</span></td></tr>
+        <tr><td>그로서리 사업부</td><td style="text-align:left">P2605 신규권역 재구매·LTV 검증, 지속 판정 · <i>2회차 재구매율 ≥ 기존권역</i></td><td class="num">8/15</td><td><span class="badge bad">높음</span></td></tr>
+        <tr><td>라이프스타일 사업부</td><td style="text-align:left">가전 할인 원칙 중단·수수료율 재협상 · <i>공헌율 3.9%→5%+ 또는 순효과 ≥0</i></td><td class="num">8/31</td><td><span class="badge">중간</span></td></tr>
+        <tr><td>경영관리팀</td><td style="text-align:left">‘자사분담 반영 실효공헌율’ 지표 추가 · <i>프로모 기간 월간 리포트화</i></td><td class="num">7/25</td><td><span class="badge">중간</span></td></tr>
+        <tr><td>재무/전략</td><td style="text-align:left">고정비 356억 커버 손익분기 GMV 역산 · <i>영업이익 BEP GMV·도달시점 제시</i></td><td class="num">8/10</td><td><span class="badge bad">높음</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      데이터 출처: 매출실적_일별_2026상반기 · 카테고리_마스터 · 프로모션_집행내역_2026상반기 · 비용계획_2026 (기준일 2026-06-30).
+      직매입=순매출−(GMV×원가율)−(GMV×물류·결제율), 위수탁·오픈마켓=수수료매출−(GMV×물류·결제율). 7–12월 비용 미집행이라 집행률·영업이익은 1–6월만 산출.
+      단위 억원(소수 1자리). <b>수치는 데모용 가상 데이터.</b>
+    </div>
+
+  </div>
+</section>
